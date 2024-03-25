@@ -33,6 +33,8 @@ class TableViewController: UITableViewController {
         button.backgroundColor = .systemPink // Colore del bottone
         button.titleLabel?.font = UIFont.systemFont(ofSize: 15) //Font del bottone
         button.layer.cornerRadius = 30 // Bordi del bottone
+        
+        
         button.addTarget(self, action: #selector(sortTasksByName), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         
@@ -51,6 +53,8 @@ class TableViewController: UITableViewController {
         button.backgroundColor = .systemPurple // Colore del bottone
         button.titleLabel?.font = UIFont.systemFont(ofSize: 15) //Font del bottone
         button.layer.cornerRadius = 30 // Bordi del bottone
+        
+        
         button.addTarget(self, action: #selector(sortTasksByDate), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         
@@ -69,7 +73,7 @@ class TableViewController: UITableViewController {
         tableView.tableHeaderView = emptyHeaderView
         
         view.addSubview(addButton)
-        view.addSubview(sortByNameButton)
+       view.addSubview(sortByNameButton)
         view.addSubview(sortByDateButton)
                
         //POSIZIONO I BOTTONI
@@ -89,8 +93,6 @@ class TableViewController: UITableViewController {
                    
                ])
         
-        //azione per il sort
-        sortByNameButton.addTarget(self, action: #selector(sortTasksByName), for: .touchUpInside)
                
                // CARICO I TASK SALVATI
                tasks = userDefaults.object(forKey: "tasks") as? [String] ?? []
@@ -130,14 +132,15 @@ class TableViewController: UITableViewController {
 
     
     //FUNCTION THAT ADDS A TASK
-    @objc func addTask(){
+    @objc func addTask() {
+        print("dentro add")
         let t = UIAlertController(title: "New Task", message: nil, preferredStyle: .alert)
-        
+
         // Campi relativi al task
         t.addTextField { textField in
             textField.placeholder = "Task name"
         }
-        
+
         // Aggiungi un selettore di data per la data
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
@@ -160,11 +163,13 @@ class TableViewController: UITableViewController {
             let task = "\(taskName) - \(dateString)"
             self?.add(task)
         }
-
-        
+     
         t.addAction(alertAddButton)
         present(t, animated: true)
+        
+     
     }
+    
     
     func add(_ task: String) {
         tasks.append(task)
@@ -175,64 +180,50 @@ class TableViewController: UITableViewController {
 
 //ALGORITMO DI insertion sort per ordinare i task per nome
     @objc func sortTasksByName() {
-        print("Sorting tasks by name...")
-        
-        for i in 1..<tasks.count {
-            var j = i
-            while j > 0 && tasks[j - 1] > tasks[j] {
-                tasks.swapAt(j - 1, j)
-                
-                //ANIMAZIONE DURANTE GLI SWAP
-                let fromIndexPath = IndexPath(row: j, section: 0)
-                let toIndexPath = IndexPath(row: j - 1, section: 0)
-                tableView.moveRow(at: fromIndexPath, to: toIndexPath) // Aggiorno con i task ordinati
-                
-                j -= 1
+            print("Sorting tasks by name...")
+            
+            for i in 1..<tasks.count {
+                var j = i
+                while j > 0 && tasks[j - 1] > tasks[j] {
+                    tasks.swapAt(j - 1, j)
+                    
+                    //ANIMAZIONE DURANTE GLI SWAP
+               //     let fromIndexPath = IndexPath(row: j, section: 0)
+                 //   let toIndexPath = IndexPath(row: j - 1, section: 0)
+                    tableView.reloadData()
+                    
+                    j -= 1
+                }
             }
         }
-    }
     
     
     
     //ALGORITMO DI insertion sort per ordinare i task per data
     @objc func sortTasksByDate() {
-        print("Sorting tasks by date...")
-        
-        // Salva l'array dei task originale
-        let originalTasks = tasks
-        
-        tasks.sort(by: { task1, task2 in
-            // Estrai le date dai task (considerando che la data è alla fine della stringa dopo il simbolo "-")
-            let dateString1 = task1.components(separatedBy: " - ").last ?? ""
-            let dateString2 = task2.components(separatedBy: " - ").last ?? ""
-            
-            // Converti le date in oggetti Date
-            let formatter = DateFormatter()
-            formatter.dateStyle = .medium
-            if let date1 = formatter.date(from: dateString1), let date2 = formatter.date(from: dateString2) {
-                // Confronta le date
-                return date1 < date2
-            }
-            // se non riesco a ordinare non cambio nulla nella view
-            return false
-        })
-        
-        // Identifica le modifiche nell'array dei task
-        var moves = [(from: IndexPath, to: IndexPath)]()
-        for (index, task) in tasks.enumerated() {
-            if let originalIndex = originalTasks.firstIndex(of: task), index != originalIndex {
-                moves.append((IndexPath(row: originalIndex, section: 0), IndexPath(row: index, section: 0)))
-            }
-        }
-        
-        // Aggiorna la tabella con un'animazione appropriata
-        tableView.beginUpdates()
-        for move in moves {
-            tableView.moveRow(at: move.from, to: move.to)
-        }
-        tableView.endUpdates()
-    }
+           print("Sorting tasks by date...")
+           
+           tasks.sort(by: { task1, task2 in
+               // Estrai le date dai task (considerando che la data è alla fine della stringa dopo il simbolo "-")
+               let dateString1 = task1.components(separatedBy: " - ").last ?? ""
+               let dateString2 = task2.components(separatedBy: " - ").last ?? ""
+               
+               // Converti le date in oggetti Date
+               let formatter = DateFormatter()
+               formatter.dateStyle = .medium
+               if let date1 = formatter.date(from: dateString1), let date2 = formatter.date(from: dateString2) {
+                   // Confronta le date
+                   return date1 < date2
+               }
+               // se non riesco a ordinare non cambio nulla nella view
+               return false
+           })
+           
+           // Aggiorno con i task ordinati
+           tableView.reloadData()
+       }
 
+    
     
     
 

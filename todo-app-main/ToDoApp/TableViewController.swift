@@ -2,104 +2,138 @@ import UIKit
 
 class TableViewController: UITableViewController {
     
-    var tasks = [String]()
-    let userDefaults = UserDefaults.standard
+    var tasks = [String]() //array of strings which contains all the tasks of the list
+    let userDefaults = UserDefaults.standard //using userdefault to save in memory all the tasks
+    
+    //HEADING OF THE PAGE: titleLabel
+    lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "To do list" // text of the label
+        label.textColor = .black // text color
+        label.font = UIFont.systemFont(ofSize: 35, weight: .bold) //text font
+        label.translatesAutoresizingMaskIntoConstraints = false //setting this variable false allows to change layout and check sizes avoiding unpredictable settings
+        return label
+    }()
+    
+    //RIPRENDI DA QUI CON IL REFACTORING!!!
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     //BUTTON ADD TASK
     lazy var addButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Add a new task", for: .normal)
-        button.setTitleColor(.white, for: .normal) //Colore scritta del bottone
-        button.backgroundColor = .systemBlue // Colore del bottone
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18) //Font del bottone
+        
+        
+        // let symbolImage = UIImage(systemName: "plus")
+        //  button.setImage(symbolImage, for: .normal)
+        
+        
+        let symbolConfig = UIImage.SymbolConfiguration(pointSize: 25)
+        let symbolImage = UIImage(systemName: "plus", withConfiguration: symbolConfig)
+        button.setImage(symbolImage, for: .normal)
+        
+        
+        
+        button.setTitleColor(.blue, for: .normal) //Colore scritta del bottone
+        button.backgroundColor = .systemBackground // Colore del bottone
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 30/*,weight: .bold*/) //Font del bottone
+        
         button.layer.cornerRadius = 15 // Bordi del bottone
         
         button.addTarget(self, action: #selector(addTask), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         
         //dimensioni del bottone
-        button.widthAnchor.constraint(equalToConstant: 150).isActive = true
+        button.widthAnchor.constraint(equalToConstant: 70).isActive = true
         button.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         return button
     }()
-     
+    
     //BUTTON SORT BY NAME
     lazy var sortByNameButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Sort by name", for: .normal)
-        button.setTitleColor(.white, for: .normal) //Colore scritta del bottone
-        button.backgroundColor = .systemPink // Colore del bottone
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 15) //Font del bottone
-        button.layer.cornerRadius = 30 // Bordi del bottone
+        let button = UIButton(type: .system) //creation of the button as a UIButton type
         
+        button.setTitle("Sort by name", for: .normal) //button title
+        button.setTitleColor(.white, for: .normal) //color title
+        button.backgroundColor = .systemBlue // button color
+        button.layer.cornerRadius = 10 // button corners
         
-        button.addTarget(self, action: #selector(sortTasksByName), for: .touchUpInside)
+        button.addTarget(self, action: #selector(sortTasksByName), for: .touchUpInside)//function
         button.translatesAutoresizingMaskIntoConstraints = false
         
         
-        button.widthAnchor.constraint(equalToConstant: 100).isActive = true
-        button.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        button.widthAnchor.constraint(equalToConstant: 100).isActive = true //button width
+        button.heightAnchor.constraint(equalToConstant: 30).isActive = true //button height
         
         return button
     }()
     
-    //bottone SORT BY DATE
+    //BUTTON Sort by Date
     lazy var sortByDateButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Sort by Date", for: .normal)
-        button.setTitleColor(.white, for: .normal) //Colore scritta del bottone
-        button.backgroundColor = .systemPurple // Colore del bottone
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 15) //Font del bottone
-        button.layer.cornerRadius = 30 // Bordi del bottone
+        let button = UIButton(type: .system) //creation of the button as a UIButton type
         
+        button.setTitle("Sort by Date", for: .normal) //button title
+        button.setTitleColor(.white, for: .normal) //color title
+        button.backgroundColor = .systemBlue // button color
+        button.layer.cornerRadius = 10 // button corners
         
-        button.addTarget(self, action: #selector(sortTasksByDate), for: .touchUpInside)
+        button.addTarget(self, action: #selector(sortTasksByDate), for: .touchUpInside) //function
         button.translatesAutoresizingMaskIntoConstraints = false
         
-        button.widthAnchor.constraint(equalToConstant: 100).isActive = true
-        button.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        button.widthAnchor.constraint(equalToConstant: 100).isActive = true //button width
+        button.heightAnchor.constraint(equalToConstant: 30).isActive = true //button height
         
         return button
     }()
     
-
+    
+    //CREATION OF THE VIEW AND ITS CONTENT
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let emptyHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 90))//per un pò di spazio tra il bottone e i task
+        let emptyHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 100))// To separate the heading from the other elements, I put a little emptyspace
         
-        tableView.tableHeaderView = emptyHeaderView
+        tableView.tableHeaderView = emptyHeaderView //Add the space to the tableView
         
-        view.addSubview(addButton)
-       view.addSubview(sortByNameButton)
-        view.addSubview(sortByDateButton)
-               
-        //POSIZIONO I BOTTONI
-               NSLayoutConstraint.activate([
-                //ADD TASK BUTTON
-                   addButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                   addButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
-
-                   //SORT BY NAME BUTTON
-                   sortByNameButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 70),
-                   sortByNameButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-                   
-                 
-                   //SORT BY DATE BUTTON
-                   sortByDateButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: -70),
-                   sortByDateButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-                   
-               ])
+        view.addSubview(titleLabel) //add the title to the view
+        view.addSubview(addButton)  //add the '+' button to the view
+        view.addSubview(sortByNameButton) //ad the 'sort by name' button to the view
+        view.addSubview(sortByDateButton)   //ad the 'sort by date' button to the view
         
-               
-               // CARICO I TASK SALVATI
-               tasks = userDefaults.object(forKey: "tasks") as? [String] ?? []
+        //Adding constraint to all the elements of the view
+        NSLayoutConstraint.activate([
+            //Constraint for the title of the view
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            titleLabel.centerYAnchor.constraint(equalTo: addButton.centerYAnchor),
+            
+            //Constraint for the '+' button
+            addButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 150),
+            addButton.topAnchor.constraint(equalTo: view.topAnchor),
+            
+            //Constraint for the 'sort by name' button
+            sortByNameButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 25),
+            sortByNameButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 50),
+            
+            //Constraint for the 'sort by date' button
+            sortByDateButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant:140),
+            sortByDateButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 50),
+        ])
+        
+        //Loading form memory (user default) all the tasks
+        tasks = userDefaults.object(forKey: "tasks") as? [String] ?? []
     }
     
     
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -129,18 +163,17 @@ class TableViewController: UITableViewController {
         return configuration
         
     }
-
+    
     
     //FUNCTION THAT ADDS A TASK
     @objc func addTask() {
-        print("dentro add")
         let t = UIAlertController(title: "New Task", message: nil, preferredStyle: .alert)
-
+        
         // Campi relativi al task
         t.addTextField { textField in
             textField.placeholder = "Task name"
         }
-
+        
         // Aggiungi un selettore di data per la data
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
@@ -150,12 +183,12 @@ class TableViewController: UITableViewController {
         datePicker.leadingAnchor.constraint(equalTo: t.view.leadingAnchor, constant: 8).isActive = true
         datePicker.trailingAnchor.constraint(equalTo: t.view.trailingAnchor, constant: -8).isActive = true
         datePicker.topAnchor.constraint(equalTo: t.view.topAnchor, constant: 60).isActive = true
-
+        
         let alertAddButton = UIAlertAction(title: "Add", style: .default) { [weak self, weak t] _ in
             guard let taskName = t?.textFields?[0].text else {
                 return
             }
-
+            
             let selectedDate = datePicker.date
             let formatter = DateFormatter()
             formatter.dateStyle = .medium
@@ -163,11 +196,11 @@ class TableViewController: UITableViewController {
             let task = "\(taskName) - \(dateString)"
             self?.add(task)
         }
-     
+        
         t.addAction(alertAddButton)
         present(t, animated: true)
         
-     
+        
     }
     
     
@@ -176,57 +209,51 @@ class TableViewController: UITableViewController {
         tableView.reloadData()
         userDefaults.set(tasks, forKey: "tasks")
     }
-
-
-//ALGORITMO DI insertion sort per ordinare i task per nome
+    
+    
+    //ALGORITMO DI insertion sort per ordinare i task per nome
     @objc func sortTasksByName() {
-            print("Sorting tasks by name...")
-            
-            for i in 1..<tasks.count {
-                var j = i
-                while j > 0 && tasks[j - 1] > tasks[j] {
-                    tasks.swapAt(j - 1, j)
-                    
-                    //ANIMAZIONE DURANTE GLI SWAP
-               //     let fromIndexPath = IndexPath(row: j, section: 0)
-                 //   let toIndexPath = IndexPath(row: j - 1, section: 0)
-                    tableView.reloadData()
-                    
-                    j -= 1
-                }
+        print("Sorting tasks by name...")
+        
+        for i in 1..<tasks.count {
+            var j = i
+            while j > 0 && tasks[j - 1] > tasks[j] {
+                tasks.swapAt(j - 1, j)
+                
+                tableView.reloadData()
+                
+                j -= 1
             }
         }
+    }
     
     
     
     //ALGORITMO DI insertion sort per ordinare i task per data
     @objc func sortTasksByDate() {
-           print("Sorting tasks by date...")
-           
-           tasks.sort(by: { task1, task2 in
-               // Estrai le date dai task (considerando che la data è alla fine della stringa dopo il simbolo "-")
-               let dateString1 = task1.components(separatedBy: " - ").last ?? ""
-               let dateString2 = task2.components(separatedBy: " - ").last ?? ""
-               
-               // Converti le date in oggetti Date
-               let formatter = DateFormatter()
-               formatter.dateStyle = .medium
-               if let date1 = formatter.date(from: dateString1), let date2 = formatter.date(from: dateString2) {
-                   // Confronta le date
-                   return date1 < date2
-               }
-               // se non riesco a ordinare non cambio nulla nella view
-               return false
-           })
-           
-           // Aggiorno con i task ordinati
-           tableView.reloadData()
-       }
-
+        print("Sorting tasks by date...")
+        
+        tasks.sort(by: { task1, task2 in
+            // Estrai le date dai task (considerando che la data è alla fine della stringa dopo il simbolo "-")
+            let dateString1 = task1.components(separatedBy: " - ").last ?? ""
+            let dateString2 = task2.components(separatedBy: " - ").last ?? ""
+            
+            // Converti le date in oggetti Date
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            if let date1 = formatter.date(from: dateString1), let date2 = formatter.date(from: dateString2) {
+                // Confronta le date
+                return date1 < date2
+            }
+            // se non riesco a ordinare non cambio nulla nella view
+            return false
+        })
+        // Aggiorno con i task ordinati
+        tableView.reloadData()
+    }
     
     
     
-
     
-  
+    
 }

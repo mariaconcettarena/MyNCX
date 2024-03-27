@@ -3,7 +3,7 @@
 ![ToDo List App](AppIcon.png)
 
 ## **Description:**
-The ToDo List App is a simple iOS application designed to help users manage their tasks efficiently. With this app, users can add, delete, and sort tasks based on their names or due dates. Additionally, the app provides notifications to remind users of pending tasks.
+ToDoApp is a simple iOS application designed to help users manage their tasks efficiently. With this app, users can add, delete, and sort tasks based on their names or due dates. Additionally, the app provides notifications to remind users of pending tasks.
 
 ## **Features:**
 1. **Add Tasks:** Users can easily add new tasks to their list along with a due date.

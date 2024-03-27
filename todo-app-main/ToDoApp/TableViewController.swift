@@ -76,6 +76,8 @@ class TableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        checkForPermission() //permission for notifications
+        
         let emptyHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 100))// To separate the heading from the other elements, I put a little emptyspace
         
         tableView.tableHeaderView = emptyHeaderView //Add the space to the tableView
@@ -237,4 +239,103 @@ class TableViewController: UITableViewController {
         tableView.reloadData()
     }
     
+    //System of notification
+    func checkForPermission() {
+        // Get the current notification center instance
+        let notificationCenter = UNUserNotificationCenter.current()
+        
+        // Retrieve the notification settings
+        notificationCenter.getNotificationSettings { settings in
+            // Switch based on the authorization status
+            switch settings.authorizationStatus {
+            case .authorized:
+                // If authorization is granted, call the function to dispatch notifications for tasks
+                self.dispatchNotificationForTasks()
+            case .denied:
+                // If authorization is denied, do nothing (user has explicitly denied permission)
+                return
+            case .notDetermined:
+                // If authorization status is not determined, request permission
+                notificationCenter.requestAuthorization(options: [.alert, .sound]) { didAllow, error in
+                    // Check if permission is granted
+                    if didAllow {
+                        // If permission is granted, call the function to dispatch notifications for tasks
+                        self.dispatchNotificationForTasks()
+                    }
+                }
+            default:
+                // Default case, do nothing
+                return
+            }
+        }
+    }
+
+    //Function dispatch notification at the day of the date of each task
+   /* func dispatchNotification(){
+        let identifier = "notification"
+        let title = "Time to..."
+        let body = "ueue"
+        let hour = 16
+        let minute = 53
+        let isDaily = true
+        
+        let notificationCenter = UNUserNotificationCenter.current()
+        
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+        
+        let calendar = Calendar.current
+        var dateComponents = DateComponents(calendar: calendar, timeZone: TimeZone.current)
+        dateComponents.hour = hour
+        dateComponents.minute = minute
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: isDaily)
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+        
+        notificationCenter.removeAllPendingNotificationRequests()
+        
+        notificationCenter.add(request)
+    }*/
+    
+    func dispatchNotificationForTasks() {
+        let notificationCenter = UNUserNotificationCenter.current()
+        
+        // Removes all the pending requests of notification to avoid copies
+        notificationCenter.removeAllPendingNotificationRequests()
+        
+        for task in tasks { //for each task
+            // take the data from each task
+            let dateString = task.components(separatedBy: " - ").last ?? ""
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            if let date = formatter.date(from: dateString) {
+                let calendar = Calendar.current
+                // verify that the task date is the same as the current date
+                if calendar.isDateInToday(date) {
+                    // take task name
+                    let taskName = task.components(separatedBy: " - ").first ?? ""
+                    // creation of the content of the notification
+                    let content = UNMutableNotificationContent()
+                    content.title = "To Do"
+                    content.body = "Today: '\(taskName)'"
+                    content.sound = .default
+                    
+                    // Set the trigger to send the notification
+                    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+                    let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+                    // Add the request for the notification
+                    notificationCenter.add(request) { error in
+                        if let error = error {
+                            print("Error \(error.localizedDescription)")
+                        } else {
+                            print("ok: \(taskName)")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

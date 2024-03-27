@@ -1,6 +1,6 @@
 # **ToDoApp README**
 
-![ToDo List App](AppIcon.png)
+![ToDo List App]([AppIcon.png](https://github.com/mariaconcettarena/MyNCX/blob/main/todo-app-main/ToDoApp/Assets.xcassets/AppIcon.appiconset/icon.jpeg))
 
 ## **Description:**
 ToDoApp is a simple iOS application designed to help users manage their tasks efficiently. With this app, users can add, delete, and sort tasks based on their names or due dates. Additionally, the app provides notifications to remind users of pending tasks.

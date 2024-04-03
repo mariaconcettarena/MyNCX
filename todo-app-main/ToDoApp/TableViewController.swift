@@ -120,9 +120,40 @@ class TableViewController: UITableViewController {
     }
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = tasks[indexPath.row]
+        
+        let task = tasks[indexPath.row]
+        let taskComponents = task.components(separatedBy: " - ")
+        
+        if taskComponents.count >= 2 {
+            let taskName = taskComponents[0]
+            let dateString = taskComponents[1]
+            
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            if let taskDate = formatter.date(from: dateString) {
+                let attributedString = NSMutableAttributedString(string: "\(taskName) - \(formatter.string(from: taskDate))")
+                
+                // Check if the task date is earlier than today
+                if Calendar.current.isDateInToday(taskDate) {
+                } else if taskDate < Date() { // Task date is earlier than today
+                    attributedString.addAttribute(.foregroundColor, value: UIColor.red, range: NSRange(location: 0, length: attributedString.length))
+                } else {
+                    attributedString.addAttribute(.foregroundColor, value: UIColor.black, range: NSRange(location: 0, length: attributedString.length))
+                }
+                
+                cell.textLabel?.attributedText = attributedString
+            } else {
+                cell.textLabel?.text = task
+                cell.textLabel?.textColor = .darkGray
+            }
+        } else {
+            cell.textLabel?.text = task
+            cell.textLabel?.textColor = .darkGray
+        }
+        
         return cell
     }
+
     
     //Function which allows the user to delete a task from the list by swiping it to the left
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
@@ -201,19 +232,19 @@ class TableViewController: UITableViewController {
             // This loop iterates backwards from the current index 'j' to 0,
             // checking if the element at index 'j - 1' is greater than the element at index 'j'.
             // If yes, it swaps the elements and decrements 'j' until the condition is false or 'j' reaches 0.
-            while j > 0 && tasks[j - 1] > tasks[j] {
+            while j > 0 && tasks[j - 1].localizedCaseInsensitiveCompare(tasks[j]) == .orderedDescending {
                 // Swap the elements at index 'j - 1' and 'j'.
                 tasks.swapAt(j - 1, j)
-                
-                // Reload data in the table view to reflect the updated order of tasks.
-                tableView.reloadData()
                 
                 // Decrement 'j' to continue the comparison with the previous element.
                 j -= 1
             }
         }
-
+        
+        // Reload data in the table view to reflect the sorted order of tasks.
+        tableView.reloadData()
     }
+
     
     //Insertion sort algorithm which sorts the tasks by their date (from the oldest to the newest) extracted from each task string.
     @objc func sortTasksByDate() {

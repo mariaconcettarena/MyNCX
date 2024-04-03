@@ -1,11 +1,13 @@
 {
   "images" : [
     {
+      "filename" : "appicon40x40.jpeg",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "20x20"
     },
     {
+      "filename" : "appicon60x60.jpeg",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "20x20"
@@ -36,7 +38,7 @@
       "size" : "60x60"
     },
     {
-      "filename" : "_b02b1ffe-da29-44ac-a6be-451db4df9426 (1).jpeg",
+      "filename" : "appicon.jpeg",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "60x60"
@@ -82,6 +84,7 @@
       "size" : "83.5x83.5"
     },
     {
+      "filename" : "_b02b1ffe-da29-44ac-a6be-451db4df9426.jpeg",
       "idiom" : "ios-marketing",
       "scale" : "1x",
       "size" : "1024x1024"

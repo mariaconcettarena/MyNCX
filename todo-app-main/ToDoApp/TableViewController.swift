@@ -142,7 +142,9 @@ class TableViewController: UITableViewController {
             
             // Initialize date formatter
                     let formatter = DateFormatter()
-                    formatter.dateStyle = .medium
+                formatter.dateFormat = "yyyy-MM-dd HH:mm"
+                formatter.timeStyle = .short
+                formatter.dateStyle = .medium // Include date
             
             if let taskDate = formatter.date(from: dateString), taskDate < Date() {
                         // Set the whole string to red if the task is expired

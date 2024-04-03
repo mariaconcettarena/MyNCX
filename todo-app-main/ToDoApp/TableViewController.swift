@@ -132,10 +132,14 @@ class TableViewController: UITableViewController {
             formatter.dateStyle = .medium
             if let taskDate = formatter.date(from: dateString) {
                 let attributedString = NSMutableAttributedString(string: "\(taskName) - \(formatter.string(from: taskDate))")
+                attributedString.addAttribute(.font, value: UIFont.boldSystemFont(ofSize: 17), range: NSRange(location: 0, length: taskName.count))
                 
-                // Check if the task date is earlier than today
-                if Calendar.current.isDateInToday(taskDate) {
-                } else if taskDate < Date() { // Task date is earlier than today
+                    // If the task date is today, append the hour to the string
+                    let hourFormatter = DateFormatter()
+                    hourFormatter.dateFormat = "hh:mm a"
+                    let hourString = hourFormatter.string(from: taskDate)
+                    attributedString.append(NSAttributedString(string: " at \(hourString)"))
+               if taskDate < Date() { // Task date is earlier than today
                     attributedString.addAttribute(.foregroundColor, value: UIColor.red, range: NSRange(location: 0, length: attributedString.length))
                 } else {
                     attributedString.addAttribute(.foregroundColor, value: UIColor.black, range: NSRange(location: 0, length: attributedString.length))
@@ -153,6 +157,7 @@ class TableViewController: UITableViewController {
         
         return cell
     }
+
 
     
     //Function which allows the user to delete a task from the list by swiping it to the left
@@ -177,23 +182,47 @@ class TableViewController: UITableViewController {
     
     //FUNCTION THAT ADDS A TASK; it is called when '+' button is tapped
     @objc func addTask() {
-        let task = UIAlertController(title: "New Task", message: nil, preferredStyle: .alert) //when '+' is tapped, an UIAlertController is opened to add the name and the date of the task
+        let task = UIAlertController(title: "New Task", message: nil, preferredStyle: .alert) //when '+' is tapped, an UIAlertController named 'task' is opened to add the name and the date of the task
         
+        //modify the height of the alertcontroller
+        let constraintHeight = NSLayoutConstraint(
+           item: task.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute:
+           NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 250)
+        task.view.addConstraint(constraintHeight)
+
+        //modify the widtht of the alertcontroller
+        let constraintWidth = NSLayoutConstraint(
+           item: task.view!, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute:
+           NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 500)
+        task.view.addConstraint(constraintWidth)
+        
+        //textfield
         task.addTextField { textField in
             textField.placeholder = "Task name" //Placeholder for the field 'name'
         }
-        
+    
         // To pick a date, there is a UIDatePicker
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
-        datePicker.preferredDatePickerStyle = .compact
         task.view.addSubview(datePicker) //adding a subview for the datepicker when the date is tapped
         datePicker.translatesAutoresizingMaskIntoConstraints = false
         
         //constraint for the datePicker
-        datePicker.leadingAnchor.constraint(equalTo: task.view.leadingAnchor, constant: 8).isActive = true
-        datePicker.trailingAnchor.constraint(equalTo: task.view.trailingAnchor, constant: -8).isActive = true
-        datePicker.topAnchor.constraint(equalTo: task.view.topAnchor, constant: 60).isActive = true
+        datePicker.leadingAnchor.constraint(equalTo: task.view.leadingAnchor, constant: 50).isActive = true
+        datePicker.trailingAnchor.constraint(equalTo: task.view.trailingAnchor, constant: -200).isActive = true
+        datePicker.topAnchor.constraint(equalTo: task.view.topAnchor, constant: 105).isActive = true
+        
+        //creation of an hourPicker
+        let hourPicker = UIDatePicker()
+        hourPicker.datePickerMode = .time
+        task.view.addSubview(hourPicker)
+        hourPicker.translatesAutoresizingMaskIntoConstraints = false
+
+        //constraint for the hourPicker
+        hourPicker.leadingAnchor.constraint(equalTo: task.view.leadingAnchor, constant: 50).isActive = true
+        hourPicker.trailingAnchor.constraint(equalTo: task.view.trailingAnchor, constant: -200).isActive = true
+        hourPicker.topAnchor.constraint(equalTo: task.view.topAnchor, constant: 155).isActive = true
+        
         
         //button 'Add' of the UIAlertController which adds the task using an UIAlertAction
         let alertAddButton = UIAlertAction(title: "Add", style: .default) { [weak self, weak task] _ in
@@ -221,7 +250,7 @@ class TableViewController: UITableViewController {
         userDefaults.set(tasks, forKey: "tasks")
     }
     
-    
+  
     //Insertion sort algorithm which sorts the tasks by their name (alphabetical order)
     @objc func sortTasksByName() {
         // This loop iterates over each index in the range from 1 to one less than the count of tasks array.

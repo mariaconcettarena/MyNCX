@@ -6,7 +6,7 @@
 ToDoApp is a simple iOS application designed to help users manage their tasks efficiently. With this app, users can add, delete, and sort tasks based on their names or due dates. Additionally, the app provides notifications to remind users of pending tasks.
 
 ## **Features:**
-1. **Add Tasks:** Users can easily add new tasks to their list along with a due date.
+1. **Add Tasks:** Users can easily add new tasks to their list along with a due date and hour.
 2. **Delete Tasks:** Tasks can be deleted individually by swiping left on them.
 3. **Sort by Name:** Tasks can be sorted alphabetically by their names.
 4. **Sort by Date:** Tasks can be sorted chronologically based on their due dates.

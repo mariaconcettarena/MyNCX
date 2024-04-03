@@ -125,38 +125,42 @@ class TableViewController: UITableViewController {
         let taskComponents = task.components(separatedBy: " - ")
         
         if taskComponents.count >= 2 {
-            let taskName = taskComponents[0]
-            let dateString = taskComponents[1]
+            let attributedString = NSMutableAttributedString()
             
-            let formatter = DateFormatter()
-            formatter.dateStyle = .medium
-            if let taskDate = formatter.date(from: dateString) {
-                let attributedString = NSMutableAttributedString(string: "\(taskName) - \(formatter.string(from: taskDate))")
-                attributedString.addAttribute(.font, value: UIFont.boldSystemFont(ofSize: 17), range: NSRange(location: 0, length: taskName.count))
-                
-                    // If the task date is today, append the hour to the string
-                    let hourFormatter = DateFormatter()
-                    hourFormatter.dateFormat = "hh:mm a"
-                    let hourString = hourFormatter.string(from: taskDate)
-                    attributedString.append(NSAttributedString(string: " at \(hourString)"))
-               if taskDate < Date() { // Task date is earlier than today
-                    attributedString.addAttribute(.foregroundColor, value: UIColor.red, range: NSRange(location: 0, length: attributedString.length))
-                } else {
-                    attributedString.addAttribute(.foregroundColor, value: UIColor.black, range: NSRange(location: 0, length: attributedString.length))
-                }
-                
-                cell.textLabel?.attributedText = attributedString
-            } else {
-                cell.textLabel?.text = task
-                cell.textLabel?.textColor = .darkGray
-            }
+            // Bold task name
+            let boldAttributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont.boldSystemFont(ofSize: 17),
+                .foregroundColor: UIColor.black
+            ]
+            let boldTaskName = NSAttributedString(string: "\(taskComponents[0])", attributes: boldAttributes)
+            attributedString.append(boldTaskName)
+            
+            // Append date and time
+            let dateString = taskComponents[1]
+            attributedString.append(NSAttributedString(string: " - \(dateString)", attributes: [NSAttributedString.Key.foregroundColor: UIColor.black]))
+            
+            
+            // Initialize date formatter
+                    let formatter = DateFormatter()
+                    formatter.dateStyle = .medium
+            
+            if let taskDate = formatter.date(from: dateString), taskDate < Date() {
+                        // Set the whole string to red if the task is expired
+                        attributedString.addAttribute(.foregroundColor, value: UIColor.red, range: NSRange(location: 0, length: attributedString.length))
+                    }
+            
+            
+            cell.textLabel?.attributedText = attributedString
         } else {
             cell.textLabel?.text = task
-            cell.textLabel?.textColor = .darkGray
+            cell.textLabel?.textColor = .black
         }
         
         return cell
     }
+
+
+
 
 
     
@@ -182,66 +186,60 @@ class TableViewController: UITableViewController {
     
     //FUNCTION THAT ADDS A TASK; it is called when '+' button is tapped
     @objc func addTask() {
-        let task = UIAlertController(title: "New Task", message: nil, preferredStyle: .alert) //when '+' is tapped, an UIAlertController named 'task' is opened to add the name and the date of the task
-        
-        //modify the height of the alertcontroller
+        let task = UIAlertController(title: "New Task", message: nil, preferredStyle: .alert)
         let constraintHeight = NSLayoutConstraint(
            item: task.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute:
-           NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 250)
+           NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 200)
         task.view.addConstraint(constraintHeight)
-
-        //modify the widtht of the alertcontroller
         let constraintWidth = NSLayoutConstraint(
            item: task.view!, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute:
            NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 500)
         task.view.addConstraint(constraintWidth)
         
-        //textfield
         task.addTextField { textField in
-            textField.placeholder = "Task name" //Placeholder for the field 'name'
+            textField.placeholder = "Task name"
         }
-    
-        // To pick a date, there is a UIDatePicker
-        let datePicker = UIDatePicker()
-        datePicker.datePickerMode = .date
-        task.view.addSubview(datePicker) //adding a subview for the datepicker when the date is tapped
-        datePicker.translatesAutoresizingMaskIntoConstraints = false
         
-        //constraint for the datePicker
+        let datePicker = UIDatePicker()
+        datePicker.datePickerMode = .dateAndTime
+        task.view.addSubview(datePicker)
+        datePicker.translatesAutoresizingMaskIntoConstraints = false
         datePicker.leadingAnchor.constraint(equalTo: task.view.leadingAnchor, constant: 50).isActive = true
-        datePicker.trailingAnchor.constraint(equalTo: task.view.trailingAnchor, constant: -200).isActive = true
+        datePicker.trailingAnchor.constraint(equalTo: task.view.trailingAnchor, constant: -145).isActive = true
         datePicker.topAnchor.constraint(equalTo: task.view.topAnchor, constant: 105).isActive = true
         
-        //creation of an hourPicker
-        let hourPicker = UIDatePicker()
-        hourPicker.datePickerMode = .time
-        task.view.addSubview(hourPicker)
-        hourPicker.translatesAutoresizingMaskIntoConstraints = false
-
-        //constraint for the hourPicker
-        hourPicker.leadingAnchor.constraint(equalTo: task.view.leadingAnchor, constant: 50).isActive = true
-        hourPicker.trailingAnchor.constraint(equalTo: task.view.trailingAnchor, constant: -200).isActive = true
-        hourPicker.topAnchor.constraint(equalTo: task.view.topAnchor, constant: 155).isActive = true
-        
-        
-        //button 'Add' of the UIAlertController which adds the task using an UIAlertAction
         let alertAddButton = UIAlertAction(title: "Add", style: .default) { [weak self, weak task] _ in
             guard let taskName = task?.textFields?[0].text else {
                 return
             }
             
-            let selectedDate = datePicker.date //putting the selected date form the datePicker in 'selectedDate' to store it
-            let formatter = DateFormatter() //formatting the Date to have it in a correct format
-            formatter.dateStyle = .medium //type of formatter
-            let dateString = formatter.string(from: selectedDate) //formatting the date into a String type to store it
-            let task = "\(taskName) - \(dateString)" //now the task added has the 'name' and the 'date' in one String
-            self?.add(task) //adding the task in memory after the formatting
+            let selectedDate = datePicker.date
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd HH:mm"
+            formatter.timeStyle = .short
+            formatter.dateStyle = .medium // Include date
+            let dateString = formatter.string(from: selectedDate)
+            
+            // Create the attributed string with the bold task name, date, and time
+            let attributedString = NSMutableAttributedString()
+            let boldAttributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont.boldSystemFont(ofSize: 17),
+                .foregroundColor: UIColor.black
+            ]
+            let boldTaskName = NSAttributedString(string: "\(taskName)", attributes: boldAttributes)
+            attributedString.append(boldTaskName)
+            
+            attributedString.append(NSAttributedString(string: " - \(dateString)", attributes: [NSAttributedString.Key.foregroundColor: UIColor.black]))
+            
+            self?.add(attributedString.string) // Add the attributed string of the task to the list
+            
         }
         
-        task.addAction(alertAddButton) //function related to the 'Add' button
-        present(task, animated: true) //the task is shown in the list after the add button
-        
+        task.addAction(alertAddButton)
+        present(task, animated: true)
     }
+
+
     
     //Function add which adds the task i memory (userDefault)
     func add(_ task: String) {
@@ -269,14 +267,13 @@ class TableViewController: UITableViewController {
                 j -= 1
             }
         }
-        
         // Reload data in the table view to reflect the sorted order of tasks.
         tableView.reloadData()
     }
 
     
     //Insertion sort algorithm which sorts the tasks by their date (from the oldest to the newest) extracted from each task string.
-    @objc func sortTasksByDate() {
+  /* @objc func sortTasksByDate() {
         // Sort the tasks array using a closure that compares the dates extracted from each task.
         tasks.sort(by: { task1, task2 in
             // Extract the date strings from the task strings.
@@ -297,8 +294,35 @@ class TableViewController: UITableViewController {
         })
         // Reload data in the table view to reflect the sorted order of tasks.
         tableView.reloadData()
-    }
+    }*/
     
+    //Insertion sort algorithm which sorts the tasks by their date (from the oldest to the newest) extracted from each task string.
+    @objc func sortTasksByDate() {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d, yyyy 'at' h:mm a"
+        
+        // Sort the tasks array using a closure that compares the dates extracted from each task.
+        tasks.sort(by: { task1, task2 in
+            // Extract the date strings from the task strings.
+            let dateString1 = task1.components(separatedBy: " - ").last ?? ""
+            let dateString2 = task2.components(separatedBy: " - ").last ?? ""
+
+            // Try to convert the date strings to Date objects.
+            if let date1 = formatter.date(from: dateString1), let date2 = formatter.date(from: dateString2) {
+                // If both conversions are successful, compare the dates.
+                return date1 < date2 // Return true if date1 is earlier than date2.
+            }
+            // If conversion fails for any date string, return false.
+            return false
+        })
+
+        // Reload data in the table view to reflect the sorted order of tasks.
+        tableView.reloadData()
+    }
+
+    
+    
+   
     //System of notification
     func checkForPermission() {
         // Get the current notification center instance
@@ -367,30 +391,32 @@ class TableViewController: UITableViewController {
         
         for task in tasks { //for each task
             // take the data from each task
-            let dateString = task.components(separatedBy: " - ").last ?? ""
-            let formatter = DateFormatter()
-            formatter.dateStyle = .medium
-            if let date = formatter.date(from: dateString) {
-                let calendar = Calendar.current
-                // verify that the task date is the same as the current date
-                if calendar.isDateInToday(date) {
-                    // take task name
-                    let taskName = task.components(separatedBy: " - ").first ?? ""
+            let taskComponents = task.components(separatedBy: " - ")
+            if taskComponents.count >= 2 {
+                let dateString = taskComponents[1]
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd HH:mm" // Set the date format to match the date string format
+                if let date = formatter.date(from: dateString) {
                     // creation of the content of the notification
                     let content = UNMutableNotificationContent()
                     content.title = "To Do"
-                    content.body = "Today: '\(taskName)'"
+                    content.body = "Today: '\(taskComponents[0])'"
                     content.sound = .default
-                    
+
                     // Set the trigger to send the notification
-                    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+                    let calendar = Calendar.current
+                    var dateComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+                    dateComponents.second = 0
+
+                    let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
                     let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+
                     // Add the request for the notification
                     notificationCenter.add(request) { error in
                         if let error = error {
                             print("Error \(error.localizedDescription)")
                         } else {
-                            print("ok: \(taskName)")
+                            print("ok: \(taskComponents[0])")
                         }
                     }
                 }

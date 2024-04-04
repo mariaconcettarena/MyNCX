@@ -31,6 +31,8 @@ The ToDo List App utilizes UIKit, Apple's UI framework for building iOS applicat
 The app leverages system notifications provided by iOS to remind users of pending tasks. By integrating with the UserNotifications framework, the app schedules notifications for the due dates of tasks. When a task's due date arrives, users receive a notification on their device, prompting them to complete the task.
 ### Data Structures and Algorithms
 The ToDo List App employs the insertion sort algorithm to sort tasks alphabetically by name or chronologically by due date. Insertion sort is a simple sorting algorithm that iterates through an array, gradually building a sorted section of the array by shifting elements one position at a time until the entire array is sorted. This algorithm is well-suited for small data sets, making it efficient for sorting tasks in the ToDo List App.
+### Data persistence
+The app utilizes the UserDefaults class provided by Swift to store and manage data locally on the user's device. UserDefaults is a simple property list where small amounts of data can be stored efficiently, making it an ideal solution for to-do list app. By leveraging UserDefaults, we can ensure that the user's tasks are always available and up-to-date, providing a seamless and convenient user experience.
 
   
 ## **Contributing:**

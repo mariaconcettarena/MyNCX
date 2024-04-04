@@ -272,31 +272,6 @@ class TableViewController: UITableViewController {
         // Reload data in the table view to reflect the sorted order of tasks.
         tableView.reloadData()
     }
-
-    
-    //Insertion sort algorithm which sorts the tasks by their date (from the oldest to the newest) extracted from each task string.
-  /* @objc func sortTasksByDate() {
-        // Sort the tasks array using a closure that compares the dates extracted from each task.
-        tasks.sort(by: { task1, task2 in
-            // Extract the date strings from the task strings.
-            let dateString1 = task1.components(separatedBy: " - ").last ?? ""
-            let dateString2 = task2.components(separatedBy: " - ").last ?? ""
-            
-            // Create a DateFormatter instance to convert date strings to Date objects.
-            let formatter = DateFormatter()
-            formatter.dateStyle = .medium
-            
-            // Try to convert the date strings to Date objects.
-            if let date1 = formatter.date(from: dateString1), let date2 = formatter.date(from: dateString2) {
-                // If both conversions are successful, compare the dates.
-                return date1 < date2 // Return true if date1 is earlier than date2.
-            }
-            // If conversion fails for any date string, return false.
-            return false
-        })
-        // Reload data in the table view to reflect the sorted order of tasks.
-        tableView.reloadData()
-    }*/
     
     //Insertion sort algorithm which sorts the tasks by their date (from the oldest to the newest) extracted from each task string.
     @objc func sortTasksByDate() {
@@ -322,9 +297,6 @@ class TableViewController: UITableViewController {
         tableView.reloadData()
     }
 
-    
-    
-   
     //System of notification
     func checkForPermission() {
         // Get the current notification center instance
